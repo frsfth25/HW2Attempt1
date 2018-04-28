@@ -1,5 +1,16 @@
 package com.farisfath25.hw2attempt1;
 
+/*
+Resources:
+- https://www.youtube.com/watch?v=BqMIcugsCFc
+- https://try.jsoup.org/
+- https://github.com/SmtCO/AndroidWeek5
+- https://www.journaldev.com/10416/android-listview-with-custom-adapter-example-tutorial
+- https://stackoverflow.com/questions/29743535/android-listview-onclick-open-a-website
+ */
+
+import android.content.Intent;
+import android.net.Uri;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 
@@ -31,12 +42,15 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
     private ListView listView;
 
     private ArrayList<String> foodList;
-    private ArrayList<String> annList;
-    private ArrayList<String> newsList;
+    private ArrayList<contentItem> annList;
+    private ArrayList<contentItem> newsList;
 
     private ArrayAdapter<String> foodAdapter;
-    private ArrayAdapter<String> annAdapter;
-    private ArrayAdapter<String> newsdAdapter;
+
+    private CustomAdapter annAdapter;
+    private CustomAdapter newsAdapter;
+
+    private int mode = 0; //1=food, 2=ann, 3=news
 
     @Override
     protected void onCreate(Bundle savedInstanceState)
@@ -52,9 +66,11 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
         listView.setOnItemLongClickListener(this);
 
         foodList = new ArrayList<String>();
-        annList = new ArrayList<String>();
-        newsList = new ArrayList<String>();
 
+        annList = new ArrayList<>();
+        newsList = new ArrayList<>();
+
+        //getFood operation
         new Thread(new Runnable()
         {
             @Override
@@ -66,7 +82,6 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
                 {
                     Document doc = Jsoup.connect("http://www.ybu.edu.tr/sks/").get();
 
-                    //ArrayList<String> foodMenu = new ArrayList<>();
                     Element table = doc.select("table").get(0); //select the first found table
                     Elements rows = table.select("tr");
 
@@ -75,25 +90,11 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
                         Element row = rows.get(i);
                         Elements cols = row.select("td");
 
-                        //foodMenu.add(cols.get(0).text());
-
                         builder.append(cols.get(0).text()).append("\n\n");
 
-                     /*   if (cols.get(7).text().equals("down"))
-                        {
-                            foodMenu.add(cols.get(5).text());
-                        }
-                    */
-
                         foodList.add(cols.get(0).text());
-
                     }
 
-                 /*)   for (int k = 0; k < foodMenu.size(); k++)
-                    {
-                        builder.append(foodMenu.get(k)).append("\n\n");
-                    }
-                    */
                 }
                 catch (IOException e)
                 {
@@ -113,7 +114,100 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
 
         foodAdapter = new ArrayAdapter<String>(this, R.layout.my_item_view,R.id.txtItem ,foodList);
 
-        tab1.setOnClickListener
+        //getAnnouncements operation
+        new Thread(new Runnable()
+        {
+            @Override
+            public void run()
+            {
+                final StringBuilder builder = new StringBuilder();
+
+                try
+                {
+                    Document doc = Jsoup.connect("http://www.ybu.edu.tr/muhendislik/bilgisayar/").get();
+
+                    //String title = doc.title();
+                    Elements annLinks = doc.select("div.contentAnnouncements div.caContent div.cncItem a");
+
+                    //builder.append(title).append("\n");
+
+                    for (Element annLink : annLinks)
+                    {
+                        builder.append("\n").append("Text: ").append(annLink.attr("title"))
+                                .append("\n").append("Link: ").append(annLink.absUrl("href"));
+
+                        String title = annLink.attr("title");
+                        String url = annLink.absUrl("href");
+
+                        annList.add(new contentItem(title,url));
+                    }
+                }
+                catch (IOException e)
+                {
+                    builder.append("Error: ").append(e.getMessage()).append("\n");
+                }
+
+                runOnUiThread(new Runnable()
+                {
+                    @Override
+                    public void run()
+                    {
+                        //content.setText(builder.toString());
+                    }
+                });
+            }
+        }).start();
+
+        annAdapter= new CustomAdapter(annList,getApplicationContext());
+
+        //getNews operation
+        new Thread(new Runnable()
+        {
+            @Override
+            public void run()
+            {
+                final StringBuilder builder = new StringBuilder();
+
+                try
+                {
+                    Document doc = Jsoup.connect("http://www.ybu.edu.tr/muhendislik/bilgisayar").get();
+
+                    //String title = doc.title();
+                    Elements nwsLinks = doc.select("div.contentNews div.cnContent div.cncItem a");
+
+                    //builder.append(title).append("\n");
+
+                    for (Element nwsLink : nwsLinks)
+                    {
+                        builder.append("\n").append("Text: ").append(nwsLink.attr("title"))
+                                .append("\n").append("Link: ").append(nwsLink.absUrl("href"));
+
+                        String title = nwsLink.attr("title");
+                        String url = nwsLink.absUrl("href");
+
+                        newsList.add(new contentItem(title,url));
+                    }
+                }
+                catch (IOException e)
+                {
+                    builder.append("Error: ").append(e.getMessage()).append("\n");
+                }
+
+                runOnUiThread(new Runnable()
+                {
+                    @Override
+                    public void run()
+                    {
+                        // content.setText(builder.toString());
+                    }
+                });
+            }
+        }).start();
+
+        newsAdapter= new CustomAdapter(newsList,getApplicationContext());
+
+        //tabs functions
+        tab1.setOnClickListener //Food tab
                 (
                         new View.OnClickListener()
                         {
@@ -122,31 +216,38 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
                             {
                                 //getFood();
 
+                                mode=1;
                                 listView.setAdapter(foodAdapter);
                             }
                         }
                 );
 
-        tab2.setOnClickListener
+        tab2.setOnClickListener //Announcements tab
                 (
                         new View.OnClickListener()
                         {
                             @Override
                             public void onClick(View view)
                             {
-                                getAnnouncements();
+                                //getAnnouncements();
+
+                                mode=2;
+                                listView.setAdapter(annAdapter);
                             }
                         }
                 );
 
-        tab3.setOnClickListener
+        tab3.setOnClickListener //News tab
                 (
                         new View.OnClickListener()
                         {
                             @Override
                             public void onClick(View view)
                             {
-                                getNews();
+                                //getNews();
+
+                                mode=3;
+                                listView.setAdapter(newsAdapter);
                             }
                         }
                 );
@@ -295,6 +396,30 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
 
     @Override
     public boolean onItemLongClick(AdapterView<?> adapterView, View view, int i, long l) {
+
+        String url;
+        Uri uri;
+        Intent intent;
+
+        if (mode==2 || mode==3) {
+            switch (mode) {
+                case 2:
+                    url = annList.get(i).getUrl();
+                    uri = Uri.parse(url);
+                    intent = new Intent(Intent.ACTION_VIEW, uri);
+                    startActivity(intent);
+                    break;
+                case 3:
+                    url = newsList.get(i).getUrl();
+                    uri = Uri.parse(url);
+                    intent = new Intent(Intent.ACTION_VIEW, uri);
+                    startActivity(intent);
+                    break;
+                default:
+                    break;
+            }
+        }
+
         return false;
     }
 }
