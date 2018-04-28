@@ -28,8 +28,6 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
     private Button tab2;
     private Button tab3;
 
-    private TextView content;
-
     private ListView listView;
 
     private ArrayList<String> foodList;
@@ -50,7 +48,70 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
         tab2 = (Button) findViewById(R.id.tab_2);
         tab3 = (Button) findViewById(R.id.tab_3);
 
-        content = (TextView) findViewById(R.id.txtContent);
+        listView = (ListView) findViewById(R.id.lvContent);
+        listView.setOnItemLongClickListener(this);
+
+        foodList = new ArrayList<String>();
+        annList = new ArrayList<String>();
+        newsList = new ArrayList<String>();
+
+        new Thread(new Runnable()
+        {
+            @Override
+            public void run()
+            {
+                final StringBuilder builder = new StringBuilder();
+
+                try
+                {
+                    Document doc = Jsoup.connect("http://www.ybu.edu.tr/sks/").get();
+
+                    //ArrayList<String> foodMenu = new ArrayList<>();
+                    Element table = doc.select("table").get(0); //select the first found table
+                    Elements rows = table.select("tr");
+
+                    for (int i = 2; i < rows.size(); i++) //first and second rows are not important
+                    {
+                        Element row = rows.get(i);
+                        Elements cols = row.select("td");
+
+                        //foodMenu.add(cols.get(0).text());
+
+                        builder.append(cols.get(0).text()).append("\n\n");
+
+                     /*   if (cols.get(7).text().equals("down"))
+                        {
+                            foodMenu.add(cols.get(5).text());
+                        }
+                    */
+
+                        foodList.add(cols.get(0).text());
+
+                    }
+
+                 /*)   for (int k = 0; k < foodMenu.size(); k++)
+                    {
+                        builder.append(foodMenu.get(k)).append("\n\n");
+                    }
+                    */
+                }
+                catch (IOException e)
+                {
+                    builder.append("Error: ").append(e.getMessage()).append("\n");
+                }
+
+                runOnUiThread(new Runnable()
+                {
+                    @Override
+                    public void run()
+                    {
+                        //content.setText(builder.toString());
+                    }
+                });
+            }
+        }).start();
+
+        foodAdapter = new ArrayAdapter<String>(this, R.layout.my_item_view,R.id.txtItem ,foodList);
 
         tab1.setOnClickListener
                 (
@@ -59,7 +120,9 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
                             @Override
                             public void onClick(View view)
                             {
-                                getFood();
+                                //getFood();
+
+                                listView.setAdapter(foodAdapter);
                             }
                         }
                 );
@@ -141,7 +204,7 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
                     @Override
                     public void run()
                     {
-                        content.setText(builder.toString());
+                        //content.setText(builder.toString());
                     }
                 });
             }
@@ -182,7 +245,7 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
                     @Override
                     public void run()
                     {
-                        content.setText(builder.toString());
+                        //content.setText(builder.toString());
                     }
                 });
             }
@@ -223,7 +286,7 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
                     @Override
                     public void run()
                     {
-                        content.setText(builder.toString());
+                       // content.setText(builder.toString());
                     }
                 });
             }

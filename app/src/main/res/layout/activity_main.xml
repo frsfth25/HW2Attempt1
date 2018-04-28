@@ -37,17 +37,13 @@
             android:background="#fff"/>
     </LinearLayout>
 
-    <TextView
-        android:id="@+id/txtContent"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Hello World!"
-        android:layout_gravity="center_horizontal"
-        android:gravity="start"
-        android:scrollbars="vertical"
-        android:layout_marginTop="10dp"
-        android:layout_weight="1" />
+   <ListView
+       android:id="@+id/lvContent"
+       android:layout_width="wrap_content"
+       android:layout_height="wrap_content"
+    >
 
+   </ListView>
 
 
 </LinearLayout>

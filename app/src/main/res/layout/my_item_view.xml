@@ -8,8 +8,8 @@
     <TextView
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:id="@+id/txtWord"
-        android:text="Word"
+        android:id="@+id/txtItem"
+        android:text="item"
         android:textSize="32dp"
         android:textColor="@color/colorAccent"/>
 
