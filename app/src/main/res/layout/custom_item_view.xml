@@ -11,7 +11,7 @@
         android:id="@+id/txtTitle"
         android:text="item"
         android:textSize="32dp"
-        android:textColor="@color/colorAccent"/>
+        android:textColor="@color/colorPrimaryDark"/>
 
     <TextView
         android:layout_width="match_parent"
