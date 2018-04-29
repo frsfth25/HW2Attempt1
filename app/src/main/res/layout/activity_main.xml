@@ -1,17 +1,18 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
+
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     tools:context="com.farisfath25.hw2attempt1.MainActivity"
+    android:background="@drawable/aybu"
     android:orientation="vertical">
 
     <TextView
         android:id="@+id/txtNote"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="For Announcements and News, long click on the list item to open the corresponding URL"
+        android:text="@string/note"
         android:gravity="center"/>
 
     <LinearLayout
@@ -23,6 +24,7 @@
             android:id="@+id/tab_1"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+
             android:text="@string/tab_1"
             android:layout_weight="1"
             android:background="#000"
@@ -33,6 +35,7 @@
             android:id="@+id/tab_2"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+
             android:text="@string/tab_2"
             android:layout_weight="1"
             android:background="#000"
@@ -42,6 +45,7 @@
             android:id="@+id/tab_3"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+
             android:text="@string/tab_3"
             android:layout_weight="1"
             android:background="#000"
@@ -53,7 +57,7 @@
             android:id="@+id/lvContent"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:background="#000"
+            android:background="#fff"
             >
 
         </ListView>
